@@ -4,7 +4,7 @@ import random
 from datetime import datetime, timedelta
 
 df_matches = pd.read_csv('dota2_matches.csv')
-# Данные команд
+# Данные команд после посчета
 teams_winrate = {
     "Heroic": 0.511, "Parivision": 0.508, "BetBoom Team": 0.506,
     "Xtreme Gaming": 0.506, "Team Liquid": 0.501, "Azure Ray": 0.498,
@@ -22,7 +22,7 @@ def calculate_h2h_stats(df_historical_matches):
         team2 = match['Команда Силы Тьмы']
         winner = match['Победитель']
         
-        # Создаем уникальный ключ для пары команд
+        # Уникальный ключ для пары команд
         pair = tuple(sorted([team1, team2]))
         
         if pair not in h2h_stats:
@@ -48,12 +48,12 @@ def generate_future_matches_with_h2h(num_matches, teams_winrate, df_historical_m
         radiant_team, dire_team = random.sample(teams, 2)
         match_date = start_date + timedelta(hours=match_id * 3)
         
-        # БАЗОВАЯ вероятность из Win Rate
+        # Базовая вероятность 
         winrate_radiant = teams_winrate[radiant_team]
         winrate_dire = teams_winrate[dire_team]
         base_prob_radiant = winrate_radiant / (winrate_radiant + winrate_dire)
         
-        # КОРРЕКЦИЯ на основе H2H истории
+        # Коррекция на основе H2H истории
         h2h_correction = 0
         pair = tuple(sorted([radiant_team, dire_team]))
         
@@ -61,7 +61,7 @@ def generate_future_matches_with_h2h(num_matches, teams_winrate, df_historical_m
             stats = h2h_stats[pair]
             total_h2h = stats['total_matches']
             
-            if total_h2h >= 3:  # Если есть достаточно данных
+            if total_h2h >= 3:  
                 radiant_wins = stats.get(radiant_team, 0)
                 h2h_winrate_radiant = radiant_wins / total_h2h
                 
@@ -71,7 +71,7 @@ def generate_future_matches_with_h2h(num_matches, teams_winrate, df_historical_m
         # Случайные факторы
         form_correction = random.uniform(-0.08, 0.08)
         
-        # ФИНАЛЬНАЯ вероятность
+        # Финальная вероятность
         final_prob_radiant = base_prob_radiant + h2h_correction + form_correction
         final_prob_radiant = max(0.2, min(0.8, final_prob_radiant))
         
@@ -99,10 +99,9 @@ def generate_future_matches_with_h2h(num_matches, teams_winrate, df_historical_m
     
     return matches
 
-# Генерируем 100 матчей С учетом H2H
+# Генерируем 100 матчей
 future_matches_data = generate_future_matches_with_h2h(100, teams_winrate, df_matches)
 
-# Создаем DataFrame
+
 future_matches_df = pd.DataFrame(future_matches_data)
 
-future_matches_df.to_csv(r'C:\Users\maxbu\OneDrive\Desktop\Проекты\Аналитика\Проект 2\dota2_futures.csv', index=False, encoding='utf-8-sig')
