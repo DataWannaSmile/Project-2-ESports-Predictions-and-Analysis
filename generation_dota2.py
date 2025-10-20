@@ -3,19 +3,19 @@ import numpy as np
 from datetime import datetime, timedelta
 import random
 
-# Настройки
-np.random.seed(42)  # для воспроизводимости
+
+np.random.seed(42)  
 NUM_MATCHES = 30000
 NUM_TEAMS = 10
 
-# Список команд (реальные и вымышленные названия для Dota 2)
+# Список команд 
 teams = [
     "Team Spirit", "Gaimin Gladiators", "Team Liquid", "BetBoom Team", 
     "Azure Ray", "Xtreme Gaming", "Shopify Rebellion", "Tundra Esports", 
     "Parivision", "Heroic"
 ]
 
-# Создаем базовые силы команд 
+ 
 team_strength = {team: np.random.normal(50, 15) for team in teams}
 
 def generate_matches(num_matches, teams):
@@ -36,12 +36,12 @@ def generate_matches(num_matches, teams):
         # Выбираем две разные команды
         radiant_team, dire_team = random.sample(teams, 2)
         
-        # Создаем ключ для пары команд (сортируем для уникальности)
+        # Создаем ключ для пары команд 
         team_pair = tuple(sorted([radiant_team, dire_team]))
         
         # Определяем победителя с учетом истории и случайности
         if team_pair in match_history:
-            # Если у команд уже была история, учитываем её
+            
             past_matches = match_history[team_pair]
             radiant_wins = past_matches.get(radiant_team, 0)
             dire_wins = past_matches.get(dire_team, 0)
@@ -91,59 +91,12 @@ def generate_matches(num_matches, teams):
             'Победившая сторона': winning_side
         })
         
-        # Прогресс
-        if match_id % 5000 == 0:
-            print(f"Сгенерировано {match_id} матчей...")
+      
     
     return matches, match_history
 
-# Генерируем матчи
-print("Генерация матчей...")
+
 matches_data, history = generate_matches(NUM_MATCHES, teams)
 
-# Создаем DataFrame
 df = pd.DataFrame(matches_data)
-
-# Проверяем распределение матчей по командам
-print("\nСтатистика по командам:")
-team_stats = []
-for team in teams:
-    team_matches = len(df[(df['Команда Силы Света'] == team) | (df['Команда Силы Тьмы'] == team)])
-    team_wins = len(df[df['Победитель'] == team])
-    win_rate = (team_wins / team_matches) * 100
-    team_stats.append({
-        'Команда': team,
-        'Матчи': team_matches,
-        'Победы': team_wins,
-        'Win Rate %': win_rate
-    })
-    print(f"{team}: {team_matches} матчей, {team_wins} побед ({win_rate:.1f}%)")
-
-# Анализируем встречи между командами
-print("\nАнализ встреч между командами (примеры):")
-team_pairs_to_check = [
-    ("Team Spirit", "Gaimin Gladiators"),
-    ("Team Liquid", "Natus Vincere"),
-    ("Azure Ray", "Xtreme Gaming")
-]
-
-for team1, team2 in team_pairs_to_check:
-    pair_key = tuple(sorted([team1, team2]))
-    if pair_key in history:
-        matches_between = sum(history[pair_key].values())
-        team1_wins = history[pair_key].get(team1, 0)
-        team2_wins = history[pair_key].get(team2, 0)
-        print(f"{team1} vs {team2}: {matches_between} матчей, {team1}: {team1_wins} побед, {team2}: {team2_wins} побед")
-
-# Проверяем распределение сторон
-radiant_wins = len(df[df['Победившая сторона'] == 'Силы света'])
-dire_wins = len(df[df['Победившая сторона'] == 'Силы тьмы'])
-
-print(f"\nОбщая статистика:")
-print(f"Всего матчей: {len(df)}")
-print(f"Побед Сил Света: {radiant_wins} ({radiant_wins/len(df)*100:.1f}%)")
-print(f"Побед Сил Тьмы: {dire_wins} ({dire_wins/len(df)*100:.1f}%)")
-
-df.to_csv(r'C:\Users\maxbu\OneDrive\Desktop\Проекты\Аналитика\Проект 2\dota2_matches.csv', index=False, encoding='utf-8-sig')
-
 
