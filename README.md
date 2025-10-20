@@ -49,4 +49,4 @@ dota2_futures:
  - DAX - для расчетов.
  
    Пример меры
- Средняя уверенность = AVERAGE('dota2_futures'[Confidence])
+  - Средняя уверенность = AVERAGE('dota2_futures'[Confidence])
